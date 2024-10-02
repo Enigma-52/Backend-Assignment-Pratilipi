@@ -1,21 +1,18 @@
 export interface IUser {
-    id: string;
-    email: string;
-    password: string;
-    createdAt: Date;
-    updatedAt: Date;
-  }
-  
-  export interface IUserInput {
-    email: string;
-    password: string;
-  }
-  
-  export interface IUserOutput {
-    id: string;
-    email: string;
-  }
-  
-  export interface IAuthToken {
-    userId: string;
-  }
+  id: string;
+  username: string;
+  email: string;
+  password: string;
+}
+
+export interface IUserInput {
+  username: string;
+  email: string;
+  password: string;
+}
+
+export interface IUserProfile {
+  id: string;
+  username: string;
+  email: string;
+}

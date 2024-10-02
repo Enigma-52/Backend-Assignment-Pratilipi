@@ -1,11 +1,12 @@
 import express from 'express';
-import { UserController } from '../controllers/userController';
-import { authenticateJWT } from '../middlewares/auth';
+import { registerUser, loginUser, updateUserProfile, getUserProfile } from '../controllers/userController';
+import { authenticateToken } from '../middlewares/auth';
 
 const router = express.Router();
 
-router.post('/register', UserController.register);
-router.post('/login', UserController.login);
-router.put('/profile', authenticateJWT, UserController.updateProfile);
+router.post('/register', registerUser);
+router.post('/login', loginUser);
+router.put('/profile', authenticateToken, updateUserProfile);
+router.get('/profile', authenticateToken, getUserProfile);
 
-export { router as userRouter };
+export default router;

@@ -1,61 +1,46 @@
-import { PrismaClient } from '@prisma/client';
-import { IProductInput, IProductOutput } from '../../types/product';
-import { publishProductCreated, publishInventoryUpdated } from '../events/producers/productProducer';
-
-const prisma = new PrismaClient();
+import Product, { IProduct } from '../models/Product';
+import { emitProductCreated, emitInventoryUpdated } from '../events/producers/productProducer';
 
 export class ProductService {
-  static async createProduct(productData: IProductInput): Promise<IProductOutput> {
-    const product = await prisma.product.create({
-      data: productData,
-    });
-
-    await publishProductCreated(product);
-
-    return product;
+  async createProduct(productData: Partial<IProduct>): Promise<IProduct> {
+    const newProduct = new Product(productData);
+    await newProduct.save();
+    await emitProductCreated(newProduct);
+    return newProduct;
   }
 
-  static async getProduct(id: string): Promise<IProductOutput | null> {
-    return prisma.product.findUnique({
-      where: { id },
-    });
+  async getProduct(productId: string): Promise<IProduct | null> {
+    return Product.findById(productId);
   }
 
-  static async updateProduct(id: string, productData: Partial<IProductInput>): Promise<IProductOutput> {
-    const product = await prisma.product.update({
-      where: { id },
-      data: productData,
-    });
-
-    if (productData.inventory !== undefined) {
-      await publishInventoryUpdated(product);
+  async updateProduct(productId: string, updateData: Partial<IProduct>): Promise<IProduct | null> {
+    const updatedProduct = await Product.findByIdAndUpdate(productId, updateData, { new: true });
+    if (updatedProduct && 'inventory' in updateData) {
+      await emitInventoryUpdated(updatedProduct);
     }
+    return updatedProduct;
+  }
 
+  async deleteProduct(productId: string): Promise<boolean> {
+    const result = await Product.findByIdAndDelete(productId);
+    return !!result;
+  }
+
+  async updateInventory(productId: string, quantity: number): Promise<IProduct | null> {
+    const product = await Product.findById(productId);
+    if (!product) return null;
+
+    product.inventory += quantity;
+    if (product.inventory < 0) product.inventory = 0;
+    
+    await product.save();
+    await emitInventoryUpdated(product);
     return product;
   }
 
-  static async deleteProduct(id: string): Promise<void> {
-    await prisma.product.delete({
-      where: { id },
-    });
-  }
-
-  static async getAllProducts(): Promise<IProductOutput[]> {
-    return prisma.product.findMany();
-  }
-
-  static async updateInventory(id: string, quantityChange: number): Promise<IProductOutput> {
-    const product = await prisma.product.update({
-      where: { id },
-      data: {
-        inventory: {
-          decrement: quantityChange,
-        },
-      },
-    });
-
-    await publishInventoryUpdated(product);
-
-    return product;
+  async getAllProducts(): Promise<IProduct[]> {
+    return Product.find();
   }
 }
+
+export const productService = new ProductService();

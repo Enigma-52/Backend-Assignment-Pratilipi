@@ -1,36 +1,48 @@
 import { Request, Response } from 'express';
-import { UserService } from '../services/userService';
-import { IUserInput, IAuthToken } from '../types/user';
+import { userService } from '../services/userService';
+import { IUserInput } from '../../types/user';
 
-export class UserController {
-  static async register(req: Request, res: Response) {
-    try {
-      const userData: IUserInput = req.body;
-      const user = await UserService.registerUser(userData);
-      res.status(201).json(user);
-    } catch (error) {
-      res.status(400).json({ message: error.message });
-    }
+export const registerUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userInput: IUserInput = req.body;
+    const newUser = await userService.registerUser(userInput);
+    res.status(201).json({ message: 'User registered successfully', user: newUser });
+  } catch (error) {
+    console.error('Error registering user:', error);
+    res.status(400).json({ message: error || 'Error registering user' });
   }
+};
 
-  static async login(req: Request, res: Response) {
-    try {
-      const { email, password } = req.body;
-      const token = await UserService.authenticateUser(email, password);
-      res.status(200).json({ token });
-    } catch (error) {
-      res.status(401).json({ message: error.message });
-    }
+export const loginUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { email, password } = req.body;
+    const token = await userService.loginUser(email, password);
+    res.status(200).json({ token });
+  } catch (error) {
+    console.error('Error logging in user:', error);
+    res.status(401).json({ message: error || 'Error logging in' });
   }
+};
 
-  static async updateProfile(req: Request, res: Response) {
-    try {
-      const userId = (req.user as IAuthToken).userId;
-      const updatedData: Partial<IUserInput> = req.body;
-      const updatedUser = await UserService.updateUserProfile(userId, updatedData);
-      res.status(200).json(updatedUser);
-    } catch (error) {
-      res.status(400).json({ message: error.message });
-    }
+export const updateUserProfile = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = (req as any).userId;
+    const updateData: Partial<IUserInput> = req.body;
+    const updatedUser = await userService.updateUserProfile(userId, updateData);
+    res.status(200).json({ message: 'Profile updated successfully', user: updatedUser });
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    res.status(400).json({ message: error || 'Error updating profile' });
   }
-}
+};
+
+export const getUserProfile = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = (req as any).userId;
+    const userProfile = await userService.getUserProfile(userId);
+    res.status(200).json({ user: userProfile });
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    res.status(404).json({ message: error || 'Error fetching profile' });
+  }
+};

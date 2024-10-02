@@ -1,22 +1,28 @@
-import amqp from 'amqplib';
+import amqp, { Channel, Connection } from 'amqplib';
+import dotenv from 'dotenv';
 
-let channel: amqp.Channel;
+dotenv.config();
 
-export const initializeRabbitMQ = async () => {
+let channel: Channel;
+
+export const connectRabbitMQ = async (): Promise<Connection> => {
   try {
-    const connection = await amqp.connect(process.env.RABBITMQ_URL || 'amqp://localhost');
+    const connection: Connection = await amqp.connect(process.env.RABBITMQ_URL as string);
     channel = await connection.createChannel();
-    
-    await channel.assertExchange('user_events', 'topic', { durable: false });
-    
     console.log('Connected to RabbitMQ');
+    return connection; // Return the connection object
   } catch (error) {
-    console.error('Failed to connect to RabbitMQ', error);
+    console.error('RabbitMQ connection error:', error);
     process.exit(1);
   }
 };
 
-export const getChannel = () => {
-  if (!channel) throw new Error('RabbitMQ channel not initialized');
-  return channel;
+export const publishMessage = async (queue: string, message: string): Promise<void> => {
+  try {
+    await channel.assertQueue(queue, { durable: false });
+    channel.sendToQueue(queue, Buffer.from(message));
+    console.log(`Message sent to queue ${queue}`);
+  } catch (error) {
+    console.error('Error publishing message:', error);
+  }
 };

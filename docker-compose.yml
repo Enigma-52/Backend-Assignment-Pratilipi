@@ -1,44 +1,168 @@
 version: '3.8'
-services:
-  postgres:
-    image: postgres:13
-    container_name: user-service-db
-    environment:
-      POSTGRES_DB: users_service
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - app-network
 
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
+services:
+
+  graphql-gateway:
+    build:
+      context: ./graphql-api-gateway
+      dockerfile: Dockerfile
     ports:
-      - "5050:80"
+      - "4000:4000"
+      - "9200:9200"
+    environment:
+      - USER_SERVICE_URL=http://user_service:3001
+      - PRODUCT_SERVICE_URL=http://product_service:3002
+      - ORDER_SERVICE_URL=http://order_service:3003
+      - ENABLE_METRICS=true
+      - METRICS_PORT=9200
     depends_on:
-      - postgres
-    networks:
-      - app-network
+      - user_service
+      - product_service
+      - order_service
+
+  user_service:
+    build: ./services/user-service
+    ports:
+      - "3001:3001"
+      - "9201:9201"
+    environment:
+      - MONGODB_URI=mongodb://user_db:27017/user_service
+      - RABBITMQ_URL=amqp://rabbitmq
+      - METRICS_PORT=9201
+    depends_on:
+      user_db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+
+  product_service:
+    build: ./services/product-service
+    ports:
+      - "3002:3002"
+      - "9202:9202"
+    environment:
+      - MONGODB_URI=mongodb://product_db:27017/product_service
+      - RABBITMQ_URL=amqp://rabbitmq
+      - METRICS_PORT=9202
+    depends_on:
+      product_db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+
+  order_service:
+    build: ./services/order-service
+    ports:
+      - "3003:3003"
+      - "9203:9203"
+    environment:
+      - MONGODB_URI=mongodb://order_db:27017/order_service
+      - RABBITMQ_URL=amqp://rabbitmq
+      - METRICS_PORT=9203
+    depends_on:
+      order_db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+
+  user_db:
+    image: mongo:latest
+    volumes:
+      - user_data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  product_db:
+    image: mongo:latest
+    volumes:
+      - product_data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  order_db:
+    image: mongo:latest
+    volumes:
+      - order_data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  user_mongo_express:
+    image: mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=user_db
+      - ME_CONFIG_MONGODB_PORT=27017
+    depends_on:
+      user_db:
+        condition: service_healthy
+
+  product_mongo_express:
+    image: mongo-express
+    ports:
+      - "8082:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=product_db
+      - ME_CONFIG_MONGODB_PORT=27017
+    depends_on:
+      product_db:
+        condition: service_healthy
+
+  order_mongo_express:
+    image: mongo-express
+    ports:
+      - "8083:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=order_db
+      - ME_CONFIG_MONGODB_PORT=27017
+    depends_on:
+      order_db:
+        condition: service_healthy
 
   rabbitmq:
     image: rabbitmq:3-management
-    container_name: rabbitmq
     ports:
       - "5672:5672"
       - "15672:15672"
-    networks:
-      - app-network
+      - "15692:15692"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
 
-networks:
-  app-network:
-    driver: bridge
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=password
+    volumes:
+      - grafana-storage:/var/lib/grafana
 
 volumes:
-  postgres_data:
+  user_data:
+  product_data:
+  order_data:
+  grafana-storage:

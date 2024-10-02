@@ -1,22 +1,25 @@
-import { Channel } from 'amqplib';
+import { Channel, ConsumeMessage } from 'amqplib';
+import { connectRabbitMQ } from '../../config/rabbitmq';
 
-export const setupUserRegisteredConsumer = (channel: Channel) => {
-  const exchange = 'user_events';
-  const queue = 'product_service_user_registered';
-  const routingKey = 'user.registered';
+export const startUserConsumer = async (): Promise<void> => {
+  try {
+    const connection = await connectRabbitMQ();
+    const channel: Channel = await connection.createChannel();
 
-  channel.assertExchange(exchange, 'topic', { durable: false });
-  channel.assertQueue(queue, { durable: false });
-  channel.bindQueue(queue, exchange, routingKey);
+    // Listen for 'user_registered' events
+    await channel.assertQueue('user_registered', { durable: false });
+    channel.consume('user_registered', (msg: ConsumeMessage | null) => {
+      if (msg) {
+        const user = JSON.parse(msg.content.toString());
+        console.log('Received user_registered event:', user);
+        // Handle user registration if needed
+        // For now, we're just logging the event
+        channel.ack(msg);
+      }
+    });
 
-  channel.consume(queue, (msg) => {
-    if (msg !== null) {
-      const userData = JSON.parse(msg.content.toString());
-      console.log('Received user registered event:', userData);
-      // Here you can add any logic needed when a new user is registered
-      // For example, you might want to create a welcome offer for the new user
-
-      channel.ack(msg);
-    }
-  });
+    console.log('User consumer started for Product service');
+  } catch (error) {
+    console.error('Error starting user consumer:', error);
+  }
 };

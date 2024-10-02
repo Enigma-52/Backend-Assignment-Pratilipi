@@ -1,45 +1,58 @@
 import express from 'express';
-import { json } from 'body-parser';
-import { PrismaClient } from '@prisma/client';
-import { userRouter } from './routes/userRoutes';
-import { initializeRabbitMQ } from './config/rabbitmq';
-import { config } from 'dotenv';
+import dotenv from 'dotenv';
+import connectDB from './config/database';
+import { connectRabbitMQ } from './config/rabbitmq';
+import userRoutes from './routes/userRoutes';
+import { startUserConsumers } from './events/consumers/userConsumer';
+import client from 'prom-client';
 
-config(); 
+dotenv.config();
 
 const app = express();
-const prisma = new PrismaClient();
+const PORT = process.env.PORT || 3001;
+const METRICS_PORT = process.env.METRICS_PORT || 9101;
 
-app.use(json());
-app.use('/api/users', userRouter);
+// Create a Registry to register the metrics
+const register = new client.Registry();
 
-const start = async () => {
-  try {
-    console.log('Attempting to connect to the database...');
-    await prisma.$connect();
-    console.log('Connected to PostgreSQL database');
-
-    console.log('Attempting to initialize RabbitMQ...');
-    await initializeRabbitMQ();
-    console.log('RabbitMQ initialized');
-
-    const port = process.env.PORT || 3000;
-    app.listen(port, '0.0.0.0', () => {
-      console.log(`User service listening on port ${port}`);
-    });
-  } catch (err) {
-    console.error('Failed to start the application:', err);
-    await prisma.$disconnect();
-    process.exit(1);
-  }
-};
-
-start();
-
-process.on('SIGINT', async () => {
-  await prisma.$disconnect();
-  console.log('Disconnected from PostgreSQL database');
-  process.exit(0);
+// Add a default label which is added to all metrics
+register.setDefaultLabels({
+  app: 'user-service'
 });
 
-export { app };
+// Enable the collection of default metrics
+client.collectDefaultMetrics({ register });
+
+app.use(express.json());
+
+// Routes
+app.use('/api/users', userRoutes);
+
+// Connect to MongoDB
+connectDB();
+
+// Connect to RabbitMQ and start consumers
+connectRabbitMQ().then(() => {
+  startUserConsumers();
+});
+
+// Create a separate Express app for metrics
+const metricsApp = express();
+
+// Expose metrics endpoint
+metricsApp.get('/metrics', async (req, res) => {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
+});
+
+// Start the main application
+app.listen(PORT, () => {
+  console.log(`User service running on port ${PORT}`);
+});
+
+// Start the metrics server
+metricsApp.listen(METRICS_PORT, () => {
+  console.log(`Metrics available at http://localhost:${METRICS_PORT}/metrics`);
+});
+
+export default app;
