@@ -40,7 +40,7 @@ describe('Order API', () => {
     expect(res.status).toBe(201);
     expect(res.body).toHaveProperty('_id');
     expect(res.body.userId).toBe(sampleOrder.userId);
-    expect(res.body.total).toBe(35); // 2*10 + 1*15
+    expect(res.body.total).toBe(35); 
     expect(res.body.status).toBe('pending');
   });
 
