@@ -17,6 +17,7 @@
 10. [Testing](#testing)
 11. [Service URLs](#service-urls)
 12. [Troubleshooting](#troubleshooting)
+13. [Login Details](#login-details)
 
 ## Assignment Overview
 
@@ -216,3 +217,24 @@ If you encounter issues with the monitoring setup:
 4. If Grafana doesn't show data:
    - Check the Prometheus data source configuration in Grafana
    - Verify that Prometheus is successfully scraping metrics
+
+## Login Details
+
+Below are the login credentials for accessing various services in the project:
+
+### Mongo Express (Database Management)
+- **Username:** admin
+- **Password:** pass
+- **Access URL:** http://localhost:8081 (User DB)
+              http://localhost:8082 (Product DB)
+              http://localhost:8083 (Order DB)
+
+### RabbitMQ Management Interface
+- **Username:** guest
+- **Password:** guest
+- **Access URL:** http://localhost:15672
+
+### Grafana (Monitoring Dashboard)
+- **Username:** admin
+- **Password:** admin
+- **Access URL:** http://localhost:3000
