@@ -1,5 +1,11 @@
 # Backend Intern Microservices Assignment
 
+## Architecture :
+
+
+![1B3ED4B4-82F8-4A66-8175-F150EB3CF773](https://github.com/user-attachments/assets/f45158ef-ec0c-4896-844f-3c14a3262160)
+
+
 ## Table of Contents
 1. [Project Overview](#project-overview)
 2. [Architecture](#architecture)
