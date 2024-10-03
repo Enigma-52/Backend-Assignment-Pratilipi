@@ -5,6 +5,7 @@ import { connectRabbitMQ } from './config/rabbitmq';
 import userRoutes from './routes/userRoutes';
 import { startUserConsumers } from './events/consumers/userConsumer';
 import client from 'prom-client';
+import bodyParser from 'body-parser';
 
 dotenv.config();
 
@@ -24,7 +25,7 @@ register.setDefaultLabels({
 client.collectDefaultMetrics({ register });
 
 app.use(express.json());
-
+app.use(bodyParser.json());
 // Routes
 app.use('/api/users', userRoutes);
 

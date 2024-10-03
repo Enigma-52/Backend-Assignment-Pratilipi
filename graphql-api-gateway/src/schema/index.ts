@@ -34,10 +34,15 @@ export const typeDefs = gql`
   }
 
   input RegisterInput {
-    username: String!
-    email: String!
-    password: String!
-  }
+  username: String!
+  email: String!
+  password: String!
+}
+
+type RegisterResponse {
+  message: String!
+  user: User!
+}
 
   input LoginInput {
     email: String!
@@ -70,7 +75,7 @@ export const typeDefs = gql`
   }
 
   type Mutation {
-    registerUser(input: RegisterInput!): AuthPayload
+    registerUser(input: RegisterInput!): RegisterResponse
     loginUser(input: LoginInput!): AuthPayload
     updateUserProfile(input: RegisterInput!): User
     createProduct(input: ProductInput!): Product

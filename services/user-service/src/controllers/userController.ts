@@ -4,8 +4,20 @@ import { IUserInput } from '../../types/user';
 
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userInput: IUserInput = req.body;
-    const newUser = await userService.registerUser(userInput);
+    console.log('Received registration request:', JSON.stringify({ ...req.body, password: req.body.password ? '[REDACTED]' : undefined }, null, 2));
+    
+    const { username, email, password } = req.body;
+    
+    // Validate input
+    if (!username || !email || !password) {
+      console.error('Missing required fields');
+      res.status(400).json({ message: 'Username, email, and password are required' });
+      return;
+    }
+
+    const newUser = await userService.registerUser({ username, email, password });
+    console.log('User registered successfully:', JSON.stringify({ id: newUser.id, username: newUser.username, email: newUser.email }, null, 2));
+    
     res.status(201).json({ message: 'User registered successfully', user: newUser });
   } catch (error) {
     console.error('Error registering user:', error);
