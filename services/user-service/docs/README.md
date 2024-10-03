@@ -49,11 +49,6 @@
     ```json
     {
       "token": "string",
-      "user": {
-        "id": "string",
-        "username": "string",
-        "email": "string"
-      }
     }
     ```
   - Error (401):
@@ -73,15 +68,17 @@
   - Success (200):
     ```json
     {
-      "id": "string",
-      "username": "string",
-      "email": "string"
+      "user":{
+        "id": "string",
+        "username": "string",
+        "email": "string"
+      }
     }
     ```
   - Error (401):
     ```json
     {
-      "message": "Unauthorized"
+      "message": "Invalid or expired token"
     }
     ```
 
@@ -113,6 +110,6 @@
   - Error (400/401):
     ```json
     {
-      "message": "Error message"
+      "message": "Invalid or expired token"
     }
     ```

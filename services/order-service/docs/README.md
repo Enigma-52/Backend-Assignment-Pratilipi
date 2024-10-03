@@ -11,10 +11,12 @@
 - **Request Body**:
   ```json
   {
-    "products": [
+    "userId": "string",
+    "items": [
       {
         "productId": "string",
-        "quantity": number
+        "quantity": number,
+        "price": number
       }
     ]
   }
@@ -25,27 +27,31 @@
     {
       "id": "string",
       "userId": "string",
-      "products": [
+      "items": [
         {
           "productId": "string",
-          "quantity": number
+          "quantity": number,
+          "price": number
         }
       ],
-      "totalAmount": number,
-      "status": "string"
+      "total": number,
+      "status": "pending",
+      "createdAt": "string",
+      "updatedAt": "string"
     }
     ```
-  - Error (400/401):
+  - Error (400):
     ```json
     {
-      "message": "Error message"
+      "message": "Error creating order",
+      "error": "Error details"
     }
     ```
 
 ### 2. Get All Orders
 - **Endpoint**: `/`
 - **Method**: `GET`
-- **Description**: Retrieve all orders (admin only)
+- **Description**: Retrieve all orders
 - **Headers**: 
   - `Authorization: Bearer <token>`
 - **Response**:
@@ -55,21 +61,25 @@
       {
         "id": "string",
         "userId": "string",
-        "products": [
+        "items": [
           {
             "productId": "string",
-            "quantity": number
+            "quantity": number,
+            "price": number
           }
         ],
-        "totalAmount": number,
-        "status": "string"
+        "total": number,
+        "status": "string",
+        "createdAt": "string",
+        "updatedAt": "string"
       }
     ]
     ```
-  - Error (401/403):
+  - Error (400):
     ```json
     {
-      "message": "Error message"
+      "message": "Error fetching orders",
+      "error": "Error details"
     }
     ```
 
@@ -87,20 +97,30 @@
     {
       "id": "string",
       "userId": "string",
-      "products": [
+      "items": [
         {
           "productId": "string",
-          "quantity": number
+          "quantity": number,
+          "price": number
         }
       ],
-      "totalAmount": number,
-      "status": "string"
+      "total": number,
+      "status": "string",
+      "createdAt": "string",
+      "updatedAt": "string"
     }
     ```
-  - Error (401/404):
+  - Error (404):
     ```json
     {
-      "message": "Error message"
+      "message": "Order not found"
+    }
+    ```
+  - Error (400):
+    ```json
+    {
+      "message": "Error fetching order",
+      "error": "Error details"
     }
     ```
 
@@ -119,28 +139,32 @@
       {
         "id": "string",
         "userId": "string",
-        "products": [
+        "items": [
           {
             "productId": "string",
-            "quantity": number
+            "quantity": number,
+            "price": number
           }
         ],
-        "totalAmount": number,
-        "status": "string"
+        "total": number,
+        "status": "string",
+        "createdAt": "string",
+        "updatedAt": "string"
       }
     ]
     ```
-  - Error (401/404):
+  - Error (400):
     ```json
     {
-      "message": "Error message"
+      "message": "Error fetching user orders",
+      "error": "Error details"
     }
     ```
 
 ### 5. Update Order Status
 - **Endpoint**: `/:id/status`
 - **Method**: `PUT`
-- **Description**: Update the status of an order (admin only)
+- **Description**: Update the status of an order
 - **Headers**: 
   - `Authorization: Bearer <token>`
 - **Parameters**: 
@@ -148,7 +172,7 @@
 - **Request Body**:
   ```json
   {
-    "status": "string"
+    "status": "shipped" | "delivered"
   }
   ```
 - **Response**:
@@ -157,19 +181,29 @@
     {
       "id": "string",
       "userId": "string",
-      "products": [
+      "items": [
         {
           "productId": "string",
-          "quantity": number
+          "quantity": number,
+          "price": number
         }
       ],
-      "totalAmount": number,
-      "status": "string"
+      "total": number,
+      "status": "string",
+      "createdAt": "string",
+      "updatedAt": "string"
     }
     ```
-  - Error (400/401/403/404):
+  - Error (404):
     ```json
     {
-      "message": "Error message"
+      "message": "Order not found"
+    }
+    ```
+  - Error (400):
+    ```json
+    {
+      "message": "Error updating order status",
+      "error": "Error details"
     }
     ```
