@@ -12,9 +12,10 @@
 5. [API Documentation](#api-documentation)
 6. [Authentication](#authentication)
 7. [Database](#database)
-9. [Message Queue](#message-queue)
-10. [Monitoring](#monitoring)
-11. [Testing](#testing)
+8. [Message Queue](#message-queue)
+9. [Monitoring](#monitoring)
+10. [Testing](#testing)
+11. [Service URLs](#service-urls)
 12. [Troubleshooting](#troubleshooting)
 
 ## Assignment Overview
@@ -108,7 +109,11 @@ Services communicate with each other using a message queue (RabbitMQ) for asynch
 
 ## API Documentation
 
-Detailed API documentation can be found in the `/docs` directory of each service. For the GraphQL API, you can access the GraphQL Playground at `http://localhost:4000/graphql` when running in development mode.
+Detailed API documentation can be found in the `/docs` directory of each service.
+
+- [User Service API](./services/user-service/docs/README.md)
+- [Product Service API](./services/product-service/docs/README.md)
+- [Order Service API](./services/order-service/docs/README.md)
 
 ## Authentication
 
@@ -164,6 +169,30 @@ To run tests for each service:
 ```
 cd services/<each-service>
 npm run test
+```
+
+## Service URLs
+
+Here are the URLs for accessing various services in the project:
+
+### Services
+- User-DB:          http://localhost:8081
+- Product-DB:       http://localhost:8082
+- Orders-DB:        http://localhost:8083
+- Grafana:          http://localhost:3000
+- Prometheus:       http://localhost:9090
+- GraphQL-Gateway:  http://localhost:4000/graphql
+- RabbitMQ:         http://localhost:15672
+
+### Microservices
+- User Service:     http://localhost:3001
+- Product Service:  http://localhost:3002
+- Order Service:    http://localhost:3003
+
+Note: Ensure all services are running before attempting to access these URLs. You can start all services using the provided script:
+
+```bash
+./scripts/start.sh
 ```
 
 ## Troubleshooting
