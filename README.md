@@ -7,9 +7,8 @@
 
 
 ## Video Walkthrough :
-[![](https://img.youtube.com/vi/cLTGD0yQ4i4/0.jpg)](https://www.youtube.com/watch?v=cLTGD0yQ4i4)
 
-https://www.youtube.com/watch?v=cLTGD0yQ4i4
+[![Video Walkthrough](https://img.youtube.com/vi/cLTGD0yQ4i4/0.jpg)](https://www.youtube.com/watch?v=cLTGD0yQ4i4)
 
 ## Postman Collection : https://bit.ly/4eoNPqu
 
