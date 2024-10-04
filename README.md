@@ -7,9 +7,9 @@
 
 
 ## Video Walkthrough :
+[![](https://img.youtube.com/vi/cLTGD0yQ4i4/0.jpg)](https://www.youtube.com/watch?v=cLTGD0yQ4i4)
 
-![99287A6A-C252-4D5D-9350-21A3C218EC3E_1_102_o](https://github.com/user-attachments/assets/98fca723-2920-41ca-a88b-5f08c6d857b7)
-
+https://www.youtube.com/watch?v=cLTGD0yQ4i4
 
 ## Postman Collection : https://bit.ly/4eoNPqu
 
@@ -249,5 +249,5 @@ Below are the login credentials for accessing various services in the project:
 
 ### Grafana (Monitoring Dashboard)
 - **Username:** admin
-- **Password:** admin
+- **Password:** password
 - **Access URL:** http://localhost:3000
