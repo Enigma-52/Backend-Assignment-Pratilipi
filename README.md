@@ -6,6 +6,13 @@
 ![1B3ED4B4-82F8-4A66-8175-F150EB3CF773](https://github.com/user-attachments/assets/f45158ef-ec0c-4896-844f-3c14a3262160)
 
 
+## Video Walkthrough :
+
+![99287A6A-C252-4D5D-9350-21A3C218EC3E_1_102_o](https://github.com/user-attachments/assets/98fca723-2920-41ca-a88b-5f08c6d857b7)
+
+
+## Postman Collection : https://bit.ly/4eoNPqu
+
 ## Table of Contents
 1. [Project Overview](#project-overview)
 2. [Architecture](#architecture)
