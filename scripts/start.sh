@@ -60,4 +60,4 @@ echo "- Prometheus:       http://localhost:9090"
 echo "- GraphQL-Gateway:  http://localhost:4000/graphql"
 echo "- RabbitMQ:         http://localhost:15672"
 echo
-echo "To stop all services, run: docker-compose down -v"
+echo "To stop all services, run: docker-compose down"

@@ -109,7 +109,7 @@ Services communicate with each other using a message queue (RabbitMQ) for asynch
 
 6. To stop all services, you can use:
    ```
-   docker-compose down -v
+   docker-compose down
    ```
 
 7. All logs will be available for each service under the logs folder.
